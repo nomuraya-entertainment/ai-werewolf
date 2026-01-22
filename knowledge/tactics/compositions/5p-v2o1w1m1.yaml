@@ -1,0 +1,129 @@
+# 5人村 戦術考察
+# 構成: 村人2、占い師1、人狼1、狂人1（騎士なし）
+# 作成日: 2026-01-23
+
+composition: "5人（村人2、占い師1、人狼1、狂人1）"
+date: "2026-01-23"
+
+# 構造的問題
+structural_issues:
+  - issue: "狂人と人狼が互いを識別できない"
+    impact: "狂人がグレー投票で人狼を吊るリスク（game-002で発生）"
+
+  - issue: "騎士がいない"
+    impact: "占いCOしていない村人は確定で噛める"
+
+  - issue: "3COで人狼陣営の連携が自動成立"
+    impact: "人狼・狂人が占いCOすれば、互いを識別できなくても対真占いで共闘できる"
+
+# 盤面分析
+board_analysis:
+  day1:
+    description: "5人生存、1人処刑"
+    key_point: "占いCO者から人狼を当てられるか"
+
+  day2:
+    description: "3人生存（1処刑1噛み後）"
+    patterns:
+      - case: "真占い処刑 or 村人処刑（1日目）"
+        result: "人狼勝利確定"
+      - case: "人狼処刑（1日目）"
+        result: "村人勝利"
+      - case: "狂人処刑（1日目）"
+        result: "2日目に持ち越し、3人で決着"
+
+# 戦術分析
+tactics_analysis:
+  - tactic: "人狼初日占いCO"
+    premise: "狂人が追従して3CO、連携が自動成立"
+    evaluation:
+      advantage:
+        - "2人で真占いを攻撃できる"
+        - "夜に占いCOしていない村人を確定で噛める"
+        - "2日目は3人から1人を当てる1/3ゲーム"
+      disadvantage:
+        - "狂人が追従してくれるか不確定"
+        - "最初にCOすると狂人か真か人狼側も分からない"
+    meta_evolution:
+      - stage: 1
+        state: "真占い最速CO"
+        assumption: "最速CO = 真目"
+      - stage: 2
+        state: "人狼最速CO"
+        assumption: "真目を偽装できる"
+      - stage: 3
+        state: "狂人最速CO"
+        assumption: "人狼を引き出したい"
+      - stage: 4
+        state: "全員『最速 = 狂人』と読む"
+        assumption: "真占い・人狼が潜伏"
+      - stage: 5
+        state: "狂人孤立、処刑される"
+        assumption: "戦術破綻、Stage 1に戻る"
+    conclusion: "循環構造、読み合いに収束"
+
+  - tactic: "人狼潜伏"
+    premise: "狂人が占いCOして場を荒らす"
+    evaluation:
+      advantage:
+        - "自分は安全な位置にいられる"
+      disadvantage:
+        - "狂人に自分が人狼だと伝わらない"
+        - "狂人がグレー投票で自分を吊るリスク（game-002）"
+    conclusion: "狂人との連携が取れず、リスク高"
+    related_game: "game-002"
+
+  - tactic: "狂人グレー投票"
+    premise: "グレーの中から村人っぽい方に投票"
+    evaluation:
+      disadvantage:
+        - "人狼を識別できないので、人狼を吊るリスクがある"
+    conclusion: "非推奨、占いローラー推しの方が安全"
+    related_game: "game-002"
+
+# 投票構造分析
+voting_analysis:
+  day1_3co:
+    description: "占いCO3人 + 村人2人の投票"
+    structure:
+      - voter: "真占い"
+        target: "人狼 or 狂人（区別つかない場合あり）"
+      - voter: "人狼"
+        target: "真占い or 狂人（区別つかない）"
+      - voter: "狂人"
+        target: "真占い or 人狼（区別つかない）"
+      - voter: "村人A"
+        target: "占いCO者の誰か"
+      - voter: "村人B"
+        target: "占いCO者の誰か"
+    key_point: "村人2人が票を合わせれば3票で確定処刑"
+    village_win_condition: "村人が人狼を正しく特定して合意できるか"
+
+  voting_order:
+    sequential:
+      description: "順番投票"
+      wolf_tactic: "狂人が最後なら人狼の吊り回避が可能"
+    simultaneous:
+      description: "一斉投票"
+      effect: "順番戦術を防げるが、村人の判断材料は変わらない"
+
+# 破綻パターン
+invalid_patterns:
+  - tactic: "人狼2日目占いCO"
+    reason: "村利のない動き、真占いなら致命的ミス扱い"
+    type: "確率破綻"
+    note: "勝率は0ではないが著しく低い"
+
+# 未解決の疑問
+open_questions:
+  - "村人2人が票を合わせる確率は？議論の質に依存？"
+  - "投票順 vs 一斉投票で勝率はどの程度変わるか？"
+  - "人狼が占いCOした場合、発言で真占いと見分けられるか？"
+  - "狂人が最速COを『読まれる』ようになったら、次の最適戦術は？"
+
+# 検証予定
+verification_plan:
+  - scenario: "人狼初日占いCO + 狂人追従"
+    purpose: "3CO時の村人の判断精度を検証"
+  - scenario: "一斉投票 vs 順番投票"
+    purpose: "投票システムによる勝率差を検証"
